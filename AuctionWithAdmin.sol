@@ -427,20 +427,14 @@ import "./EnumerableMap.sol";
     /// @dev Bids on an open auction.
     /// @param _autionId - Unique Id of aution.
     function bid(uint256 _autionId) public payable {    
-        require(
-            block.timestamp > auction[_autionId].startTime,
-            "Auction not started yet"
-        );
+        require(block.timestamp > auction[_autionId].startTime, "Auction not started yet");
         require(block.timestamp < auction[_autionId].endTime, "Auction is over");
         require(msg.sender != EnumerableMap.get(auctionId, _autionId), "Owner can't bid in auction");
         // The first bid, ensure it's >= the reserve price.
         if(msg.value < pending_claim_auction[msg.sender][_autionId]){
             //msg.value = pending_claim_auction[msg.sender][_autionId];
         }
-        require(
-             msg.value >= auction[_autionId].price,
-            "Bid must be at least the reserve price"
-        );
+        require(msg.value >= auction[_autionId].price, "Bid must be at least the reserve price");
         // Bid must be greater than last bid.
         require(msg.value > auction[_autionId].highestBid, "Bid amount too low");
        
@@ -574,33 +568,14 @@ import "./EnumerableMap.sol";
     /// @param _tokenId - ID of NFT on offer.
     function reciveOffer(uint256 _tokenId) public {
         require(msg.sender ==  EnumerableMap.get(saleId, _tokenId), "You are not owner");
-        nft_token.safeTransferFrom(
-            address(this),
-            offer[_tokenId].offerer,
-            _tokenId,
-            1,
-            ""
-        );
+        nft_token.safeTransferFrom(address(this), offer[_tokenId].offerer, _tokenId, 1, "");
+
         if(sell_service_fee == true){   
-            token.transfer(
-                beneficiary,
-                ((offer[_tokenId].price * sell_token_fee) / 100)
-            );
-            emit SellFee(
-                tokenIdToSaleId[_tokenId],
-                _tokenId,
-                ((offer[_tokenId].price * sell_token_fee) / 100),
-                block.timestamp
-            );
-            token.transfer(
-                EnumerableMap.get(saleId, _tokenId),
-                ((offer[_tokenId].price * (100 - sell_token_fee)) / 100)
-            );
+            token.transfer(beneficiary, ((offer[_tokenId].price * sell_token_fee) / 100));
+            emit SellFee(tokenIdToSaleId[_tokenId], _tokenId, ((offer[_tokenId].price * sell_token_fee) / 100), block.timestamp);
+            token.transfer(EnumerableMap.get(saleId, _tokenId), ((offer[_tokenId].price * (100 - sell_token_fee)) / 100));
         }else{
-            token.transfer(
-                EnumerableMap.get(saleId, _tokenId),
-                offer[_tokenId].price
-            );
+            token.transfer(EnumerableMap.get(saleId, _tokenId), offer[_tokenId].price);
         }
         for(uint256 i = 0; i < saleTokenIds[msg.sender].length; i++){
             if(saleTokenIds[msg.sender][i] == _tokenId){
@@ -612,14 +587,7 @@ import "./EnumerableMap.sol";
         delete token_price[_tokenId];       
         EnumerableMap.remove(saleId, _tokenId);
         pending_claim_offer[offer[_tokenId].offerer][_tokenId] = 0;
-        emit OfferReceived(
-            tokenIdToSaleId[_tokenId],
-            offer[_tokenId].offerer,
-            _tokenId,
-            msg.sender,
-            offer[_tokenId].price,
-            block.timestamp
-        );
+        emit OfferReceived(tokenIdToSaleId[_tokenId], offer[_tokenId].offerer, _tokenId, msg.sender, offer[_tokenId].price, block.timestamp);
         delete offer_info[offer[_tokenId].offerer][_tokenId];
         delete offer[_tokenId];
         delete tokenIdToSaleId[_tokenId];       
@@ -729,9 +697,9 @@ import "./EnumerableMap.sol";
     }
 
     /// @dev Returns sell NFT token price.
-    /// @param _tokenId - ID of NFT.
-    function getSellTokenPrice(uint256 _tokenId) public view returns (uint256) {
-        return token_price[_tokenId];
+    /// @param _saleId - unique sale id of token.
+    function getSellTokenPrice(uint256 _saleId) public view returns (uint256) {
+        return token_price[_saleId];
     }
 
 
