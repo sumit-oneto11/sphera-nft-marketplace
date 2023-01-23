@@ -361,7 +361,7 @@ import "./EnumerableMap.sol";
         require(_price > 0, "Price must be greater than zero");
 
         DealDetails memory dealToken;
-        dealToken = DealDetails({
+        dealToken = DealDetails({ 
             tokenId: _tokenId,
             price: _price,
             quantity: _quantity,
@@ -519,11 +519,9 @@ import "./EnumerableMap.sol";
     /// @dev Offer on an sell.
     /// @param _tokenId - ID of token to offer on.
     /// @param _amount  - Offerer set the price (in token) of NFT token.
-    function makeOffer(uint256 _tokenId, uint256 _amount) public {             
-        require(
-            EnumerableMap.get(saleId, _tokenId) != address(0) && token_price[_tokenId] > 0,
-            "Token not for sell"
-        );
+    /// @param _qunatity  - Offerer set the _qunatity of token.
+    function makeOffer(uint256 _tokenId, uint256 _amount, uint256 _qunatity) public {             
+        require(EnumerableMap.get(saleId, _tokenId) != address(0) && token_price[_tokenId] > 0, "Token not for sell");
         require(msg.sender != EnumerableMap.get(saleId, _tokenId), "Owner can't make the offer");
         if(_amount < pending_claim_offer[msg.sender][_tokenId]){
             _amount = pending_claim_offer[msg.sender][_tokenId];
